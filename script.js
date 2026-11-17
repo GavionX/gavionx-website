@@ -1,5 +1,5 @@
 // Address that enquiries are sent to. Change this to your real mailbox.
-const CONTACT_EMAIL = 'info@gavionx.com';
+const CONTACT_EMAIL = 'admin@gavionx.com';
 
 document.documentElement.classList.add('js');
 
