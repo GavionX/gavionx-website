@@ -99,7 +99,8 @@
             <textarea name="message" rows="4" placeholder="Types of vehicle, what you want to track, anything else…"></textarea>
           </label>
           <button class="btn" type="submit">Send message</button>
-          <p class="form-note">This opens your email app with the enquiry ready to send.</p>
+          <input type="checkbox" name="botcheck" class="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <p id="form-status" class="form-status" role="status" aria-live="polite" hidden></p>
         </form>
 
         <div class="contact-cards">

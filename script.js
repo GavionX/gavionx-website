@@ -97,24 +97,57 @@ if (form) {
   const option = wanted && form.querySelector('option[data-key="' + CSS.escape(wanted) + '"]');
   if (option) option.selected = true;
 
-  form.addEventListener('submit', (e) => {
+  // Enquiries are sent through Web3Forms, which emails them to the address
+  // registered with this access key. The key is public by design.
+  const WEB3FORMS_KEY = '81916cf8-f25b-4b6b-9fd2-a0c8cc1d2c9e';
+  const button = form.querySelector('button[type="submit"]');
+  const status = document.getElementById('form-status');
+  const showStatus = (text, ok) => {
+    status.textContent = text;
+    status.className = 'form-status ' + (ok ? 'is-ok' : 'is-error');
+    status.hidden = false;
+  };
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = new FormData(form);
-    const line = (label, name) => (data.get(name) ? label + ': ' + data.get(name) + '\n' : '');
-    const subject = 'Enquiry: ' + data.get('product');
-    const body =
-      line('Name', 'name') +
-      line('Company', 'company') +
-      line('Email', 'email') +
-      line('Phone', 'phone') +
-      line('City', 'city') +
-      line('Number of vehicles', 'fleet') +
-      line('Subject', 'product') +
-      '\n' + (data.get('message') || '');
-    window.location.href =
-      'mailto:' + CONTACT_EMAIL +
-      '?subject=' + encodeURIComponent(subject) +
-      '&body=' + encodeURIComponent(body);
+    if (data.get('botcheck')) return; // hidden field only bots fill in
+
+    const payload = {
+      access_key: WEB3FORMS_KEY,
+      subject: 'Website enquiry: ' + data.get('product'),
+      from_name: 'GavionX website',
+      replyto: data.get('email'),
+      'Name': data.get('name'),
+      'Company': data.get('company'),
+      'Email': data.get('email'),
+      'Phone': data.get('phone'),
+      'City': data.get('city'),
+      'Number of vehicles': data.get('fleet'),
+      'Subject': data.get('product'),
+      'Message': data.get('message'),
+    };
+    Object.keys(payload).forEach((k) => { if (payload[k] === '' || payload[k] === null) delete payload[k]; });
+
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    status.hidden = true;
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok || result.success === false) throw new Error(result.message || 'Request failed');
+      form.reset();
+      showStatus("Thank you — your enquiry has been sent. We'll get back to you shortly.", true);
+    } catch (err) {
+      showStatus('Sorry, your message could not be sent. Please try again, or call us on +91 78931 23431.', false);
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Send message';
+    }
   });
 }
 

@@ -269,6 +269,11 @@ address { font-style: normal; }
 .form input:focus, .form select:focus, .form textarea:focus { outline: 2px solid var(--blue); outline-offset: 0; border-color: var(--blue); }
 .form .btn { justify-self: start; }
 .form-note { margin: 0; font-size: .82rem; color: var(--muted); }
+.form .btn:disabled { opacity: .6; cursor: wait; transform: none; }
+.botcheck { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.form-status { margin: 0; padding: 12px 14px; border-radius: 8px; font-size: .92rem; }
+.form-status.is-ok { background: #e3f6ec; color: #0c6b43; }
+.form-status.is-error { background: #fde7e5; color: #8a231d; }
 .contact-cards { display: grid; gap: 16px; }
 .contact-card {
   display: flex; gap: 18px; align-items: flex-start;
